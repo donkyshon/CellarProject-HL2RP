@@ -1,5 +1,2 @@
 
 DeriveGamemode("helix")
-
-
-DeriveGamemode("helix")
