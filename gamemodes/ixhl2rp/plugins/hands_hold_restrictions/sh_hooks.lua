@@ -1,33 +1,23 @@
 
-local speedMultipliers = {
-	[FACTION_OTA] = 0.25
-}
+local speedMultipliers = {}
 
-local function IsCarryingCharInCrit(client)
-	local hands = client.ixActiveHands
+local function GetHeldChar(client)
+	local heldPlayer = client.ixHeldPlayer
 
-	if (IsValid(hands)) then
-		local heldPlayer = IsValid(hands.heldEntity) and hands.heldEntity.ixPlayer
-
-		if (heldPlayer and heldPlayer:GetNetVar("crit")) then
-			return heldPlayer
-		end
+	if (IsValid(heldPlayer)) then
+		return heldPlayer
 	end
 
 	return false
 end
 
--- we don't want to use pretty heavy ActiveWeapon func
-function PLUGIN:PlayerSwitchWeapon(client, _, weapon)
-	weapon = weapon:GetClass() == "ix_hands" and weapon or nil
-
-	if (weapon != client.ixActiveHands) then
-		client.ixActiveHands = weapon
-	end
+function PLUGIN:InitializedPlugins()
+	speedMultipliers[FACTION_OTA] = 0.25
+	speedMultipliers[FACTION_EOW] = 0.25
 end
 
 function PLUGIN:SetupMove(client, moveData)
-	local heldPlayer = IsCarryingCharInCrit(client)
+	local heldPlayer = GetHeldChar(client)
 
 	if (heldPlayer) then
 		if (client:IsProne() and prone.CanExit(client)) then
@@ -39,7 +29,7 @@ function PLUGIN:SetupMove(client, moveData)
 end
 
 PLUGIN["prone.CanEnter"] = function(_, client)
-	if (IsCarryingCharInCrit(client)) then
+	if (GetHeldChar(client)) then
 		return false
 	end
 end

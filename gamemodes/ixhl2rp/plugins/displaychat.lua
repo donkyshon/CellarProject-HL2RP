@@ -21,13 +21,24 @@ ix.option.Add("Длительность на символ", ix.type.number, 0.4,
 
 if (SERVER) then return end
 
+surface.CreateFont("awDisplayChat32", {
+	font = genericFont,
+	size = 32,
+	extended = true,
+	weight = 1000
+})
+
 local stored = PLUGIN.chatDisplay or {}
 PLUGIN.chatDisplay = stored
+
+local function GetColor(info)
+	local ct = info.chatType
+	return (ct == "y" and Color(238,59,59)) or (ct == "w" and Color(71,71,71)) or color_white
+end
 
 function PLUGIN:MessageReceived(client, messageInfo)
 	if (IsValid(client) and client != LocalPlayer() and ix.option.Get("Отображение текста над головой", false)) then
 		if (hook.Run("ShouldChatMessageDisplay", client, messageInfo) != false) then
-			local character = client:GetCharacter()
 			local maxLen = ix.option.Get("Лимит длины сообщения")
 			local text = messageInfo.text
 			local textLen = string.utf8len(text)
@@ -35,7 +46,9 @@ function PLUGIN:MessageReceived(client, messageInfo)
 
 			stored[client] = {
 				text = textLen > maxLen and utf8.sub(text, 1, ix.option.Get("Лимит длины сообщения")).."..." or text,
-				color = class and class.color or color_white,
+				-- color = class and class.color or color_white,
+				color = GetColor(messageInfo),
+				font = messageInfo.chatType == "y" and "awDisplayChat32" or "ixGenericFont",
 				fadeTime = duration
 			}
 		end
@@ -54,6 +67,9 @@ function PLUGIN:ShouldChatMessageDisplay(client, messageInfo)
 	if (LocalPlayer():EyePos():DistToSqr(client:EyePos()) >= 300 * 300) then
 		return false
 	end
+	if client:GetMoveType() == MOVETYPE_NOCLIP then
+		return false
+	end
 end
 
 function PLUGIN:HUDPaint()
@@ -62,7 +78,6 @@ function PLUGIN:HUDPaint()
 		local clientPos = client:EyePos()
 		local scrW = ScrW()
 		local cx, cy = scrW * 0.5, ScrH() * 0.5
-		local curTime = CurTime()
 		local toRem = {}
 
 		for k, v in pairs(stored) do
@@ -76,7 +91,7 @@ function PLUGIN:HUDPaint()
 					local distanceMult = (1 - distSqr * 0.003 * 0.003) -- 0.003 == 1/300
 					local alpha = 255 * camMult * distanceMult * math.min(v.fadeTime, 1)
 					local col1, col2 = ColorAlpha(v.color, alpha), Color(0, 0, 0, alpha)
-					local font = "ixGenericFont"
+					local font = v.font
 
 				surface.SetFont(font)
 

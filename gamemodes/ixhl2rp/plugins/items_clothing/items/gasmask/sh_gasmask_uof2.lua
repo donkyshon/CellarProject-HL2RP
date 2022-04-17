@@ -23,6 +23,6 @@ ITEM.Stats = {
 	[5] = 0,
 }
 ITEM.WeaponSkillBuff = 2
-ITEM.CPMask = true
+ITEM.CPMask = false
 ITEM.visorLevel = 2
 ITEM.withOutfit = true
