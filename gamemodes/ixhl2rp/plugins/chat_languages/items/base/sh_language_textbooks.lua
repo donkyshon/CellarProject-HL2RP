@@ -7,10 +7,6 @@ ITEM.languageID = "english"
 ITEM.volume = 1
 ITEM.studyTime = 60
 
-function ITEM:GetStudyTimeLeftDataKey()
-	return ix.chatLanguages.GetStudyTimeLeftGenericDataKey(self.languageID) .. self.volume
-end
-
 if (CLIENT) then
 	function ITEM:GetName()
 		local languageData = ix.chatLanguages.Get(self.languageID)
@@ -25,7 +21,7 @@ if (CLIENT) then
 	function ITEM:PopulateTooltip(tooltip)
 		local client = LocalPlayer()
 		local character = client:GetCharacter()
-		local charLanguageData = character:GetData(self:GetStudyTimeLeftDataKey())
+		local studyProgress = character:GetLanguageStudyProgress(self.languageID, self.volume)
 		local color, text
 
 		local progressT = tooltip:AddRowAfter("name", "progress")
@@ -33,21 +29,21 @@ if (CLIENT) then
 		if (character:GetStudiedLanguages(self.languageID)) then
 			text = L("textbookLanguageStudied")
 			color = derma.GetColor("Success", progressT)
-		elseif (!charLanguageData) then
+		elseif (!studyProgress) then
 			text = L("textbookNoStudy")
 			color = derma.GetColor("Error", progressT)
-		elseif (isnumber(charLanguageData)) then
-			local percentage = string.format("%.2f", math.Round((1 - charLanguageData / self.studyTime) * 100, 2)) .. "%"
+		elseif (isnumber(studyProgress)) then
+			local percentage = string.format("%.2f", math.Round((1 - studyProgress / self.studyTime) * 100, 2)) .. "%"
 
 			text = L("textbookStudyInProgress", percentage)
 			color = derma.GetColor("Info", progressT)
-		elseif (charLanguageData == true) then
+		elseif (studyProgress == true) then
 			text = L("textbookStudySuccess")
 			color = derma.GetColor("Success", progressT)
 		end
 
 		progressT:SetBackgroundColor(color)
-		progressT:SetText(L("textbookStudyProgress", text))
+		progressT:SetText(text)
 		progressT:SizeToContents()
 	end
 end
@@ -66,33 +62,34 @@ ITEM.functions.Study = {
 				local steamID = client:SteamID()
 				local timerID = "ixStudyingLanguage" .. steamID
 				local actionTimerID = "ixAct" .. steamID
-				local dataKey = item:GetStudyTimeLeftDataKey()
-				local studyTime = character:GetData(dataKey, item.studyTime)
+				local maxReadTime = ix.config.Get("languageTextbooksMinReadTime", 3600) * item.volume
+				local studyProgress = character:GetLanguageStudyProgress(item.languageID, item.volume) or item.studyTime
 
-				if (studyTime > item.studyTime) then
-					studyTime = item.studyTime
+				if (studyProgress > maxReadTime) then
+					studyProgress = maxReadTime
 
-                    character:SetData(dataKey, item.studyTime)
+					character:SetLanguageStudyProgress(item.languageID, item.volume, studyProgress)
 				end
 
-				client:SetAction("@studyingLanguage", studyTime, function()
+				client:SetAction("@studyingLanguage", studyProgress, function()
 					local languageName = L(languageData.name, client)
 					local volumeCount = ix.config.Get("languageTextbooksVolumeCount", 3)
-					local genericDataKey = dataKey:utf8sub(1, dataKey:utf8len() - 1)
-					local textbookNumber = dataKey:utf8sub(-1)
-
-					character:SetData(dataKey, true)
+					local studyProgresses = character:GetLanguageStudyProgress(item.languageID)
+                    print("LANGUAGE:")
+                    PrintTable(studyProgresses)
 
 					for i = 1, volumeCount do
-						if (character:GetData(genericDataKey .. i) != true) then
-							client:NotifyLocalized("volumeStudied", textbookNumber, volumeCount, languageName)
-							ix.log.Add(client, "studiedLanguageTextbook", textbookNumber, volumeCount, languageData.name)
+						if (item.volume != i and studyProgresses[i] != true) then
+							character:SetLanguageStudyProgress(item.languageID, item.volume, true)
+
+							client:NotifyLocalized("volumeStudied", item.volume, volumeCount, languageName)
+							ix.log.Add(client, "studiedLanguageTextbook", item.volume, volumeCount, languageData.name)
 
 							return
 						end
 					end
 
-					character:ResetLanguageLeftStudyTime(item.languageID, genericDataKey, volumeCount)
+					character:ClearLanguageStudyProgress(item.languageID)
 
 					character:SetStudiedLanguages(item.languageID, true)
 					client:NotifyLocalized("languageStudied", languageName)
@@ -101,7 +98,7 @@ ITEM.functions.Study = {
 					timer.Remove(timerID)
 				end)
 
-				timer.Create(timerID, 0.1, studyTime / 0.1, function()
+				timer.Create(timerID, 0.1, math.floor(studyProgress / 0.1), function()
 					if (IsValid(client)) then
 						local bNotInInventory = client != item:GetOwner()
 
@@ -113,7 +110,7 @@ ITEM.functions.Study = {
 							-- just in case
 							timer.Remove(timerID)
 						elseif (timer.RepsLeft(timerID) > 0) then
-							character:SetData(dataKey, timer.TimeLeft(actionTimerID))
+							character:SetLanguageStudyProgress(item.languageID, item.volume, timer.TimeLeft(actionTimerID))
 						end
 					else
 						timer.Remove(actionTimerID)
@@ -137,6 +134,6 @@ ITEM.functions.Study = {
 		local client = item.player
 		local character = client:GetCharacter()
 
-		return character:GetData(item:GetStudyTimeLeftDataKey()) != true and !character:GetStudiedLanguages(item.languageID)
+		return character:GetLanguageStudyProgress(item.languageID, item.volume) != true and !character:GetStudiedLanguages(item.languageID)
 	end
 }

@@ -67,16 +67,13 @@ if (SERVER) then
 				bodygroups = bodygroups,
 				bubble = entity:GetNoBubble(),
 				items = entity.items,
-				prices = entity.prices,
 				factions = entity.factions,
 				classes = entity.classes,
 				money = entity.money,
 				scale = entity.scale,
 				anim = entity.anim,
 				card_access = entity.card_access,
-				password = entity.password,
-				legal_status = entity.legal_status,
-				economy_id = entity.economy_id
+				password = entity.password
 			}
 		end
 
@@ -118,29 +115,17 @@ if (SERVER) then
 			end
 
 			entity.items = items
-			local prices = {}
-			
-			for uniqueID, data in pairs(v.prices) do
-				prices[tostring(uniqueID)] = data
-			end
-			entity.prices = prices
-			
 			entity.factions = v.factions or {}
 			entity.classes = v.classes or {}
 			entity.money = v.money
 			entity.scale = v.scale or 0.5
 			entity.card_access = v.card_access or ""
 			entity.password = v.password or ""
-			entity.legal_status = v.legal_status or 0
-			entity.economy_id = v.economy_id or ""
 			entity.Sessions = {}
 
 			if v.anim and isstring(v.anim) then
 				entity:OnChangedAnim(v.anim)
 			end
-			--if entity.economy_id != '' then
-			--	ix.admiral.VendorUpdateItems(_, entity)
-			--end
 		end
 	end
 
@@ -364,26 +349,23 @@ if (SERVER) then
 				local found = false
 				local name
 
-				--if (!entity:HasMoney(price)) then
-				--	return client:NotifyLocalized("vendorNoMoney")
-				--end
+				if (!entity:HasMoney(price)) then
+					return client:NotifyLocalized("vendorNoMoney")
+				end
 
 				local stock, max = entity:GetStock(uniqueID)
 
 				if (stock and stock >= max) then
 					return client:NotifyLocalized("vendorMaxStock")
 				end
-				
-				local found_item = false
 
-				-- local invOkay = true
-				
+				local invOkay = true
 
 				for _, v in pairs(client:GetCharacter():GetInventory():GetItems()) do
 					if (v.uniqueID == uniqueID and v:GetID() != 0 and ix.item.instances[v:GetID()] and v:GetData("equip", false) == false) then
+						invOkay = v:Remove()
 						found = true
-						found_item = v
-						name = L(found_item.name, client)
+						name = L(v.name, client)
 
 						break
 					end
@@ -392,18 +374,19 @@ if (SERVER) then
 				if (!found) then
 					return
 				end
-				ix.admiral.TradeCheck(client, client:GetCharacter(), entity.economy_id, 'sell', uniqueID)
-				--if entity.legal_status == 'legal' then
-				--	ix.admiral.PaymentFromSalesman(client, client:GetCharacter(), price, uniqueID)
-				--else
-				--	ix.admiral.CashFromSalesman(client, client:GetCharacter(), price, uniqueID)
-				--end
 
-				-- client:GetCharacter():GiveMoney(price)
-				-- entity:TakeMoney(price)
-				-- entity:AddStock(uniqueID)
+				if (!invOkay) then
+					client:GetCharacter():GetInventory():Sync(client, true)
+					return client:NotifyLocalized("tellAdmin", "trd!iid")
+				end
 
-				
+				client:GetCharacter():GiveMoney(price)
+				client:NotifyLocalized("businessSell", name, ix.currency.Get(price))
+				entity:TakeMoney(price)
+				entity:AddStock(uniqueID)
+
+				PLUGIN:SaveData()
+				hook.Run("CharacterVendorTraded", client, entity, uniqueID, isSellingToVendor)
 			else
 				local stock = entity:GetStock(uniqueID)
 
@@ -411,33 +394,30 @@ if (SERVER) then
 					return client:NotifyLocalized("vendorNoStock")
 				end
 
-				if entity.legal_status == 'illegal' then
-					if (!client:GetCharacter():HasMoney(price)) then
-						return client:NotifyLocalized("canNotAfford")
-					end
-					-- ix.admiral.PaymentToSalesman(client, client:GetCharacter(), price, uniqueID)
-				--else
-					
-					
-					-- ix.admiral.CashToSalesman(client, client:GetCharacter(), price, uniqueID)
+				if (!client:GetCharacter():HasMoney(price)) then
+					return client:NotifyLocalized("canNotAfford")
 				end
-				ix.admiral.TradeCheck(client, client:GetCharacter(), entity.economy_id, 'buy', uniqueID)
-				--
-				--if (!client:GetCharacter():GetInventory():Add(uniqueID)) then
-				--	ix.item.Spawn(uniqueID, client)
-				--else
-				--	net.Start("ixVendorAddItem")
-				--		net.WriteString(uniqueID)
-				--	net.Send(client)
-				--end
-				--
 
-				-- entity:TakeStock(uniqueID)
+				local name = L(ix.item.list[uniqueID].name, client)
 
-				
+				client:GetCharacter():TakeMoney(price)
+				client:NotifyLocalized("businessPurchase", name, ix.currency.Get(price))
+
+				entity:GiveMoney(price)
+
+				if (!client:GetCharacter():GetInventory():Add(uniqueID)) then
+					ix.item.Spawn(uniqueID, client)
+				else
+					net.Start("ixVendorAddItem")
+						net.WriteString(uniqueID)
+					net.Send(client)
+				end
+
+				entity:TakeStock(uniqueID)
+
+				PLUGIN:SaveData()
+				hook.Run("CharacterVendorTraded", client, entity, uniqueID, isSellingToVendor)
 			end
-			PLUGIN:SaveData()
-			hook.Run("CharacterVendorTraded", client, entity, uniqueID, isSellingToVendor)
 		else
 			client:NotifyLocalized("vendorNoTrade")
 		end
@@ -457,9 +437,7 @@ else
 
 		entity.money = net.ReadUInt(16)
 		entity.items = net.ReadTable()
-		entity.prices = net.ReadTable()
 		entity.scale = net.ReadFloat()
-		entity.legal_status = net.ReadString()
 
 		ix.gui.vendor = vgui.Create("ixVendor")
 		ix.gui.vendor:SetReadOnly(false)
@@ -477,12 +455,10 @@ else
 		entity.password = net.ReadString()
 		entity.card_access = net.ReadString()
 		entity.items = net.ReadTable()
-		entity.prices = net.ReadTable()
 		entity.scale = net.ReadFloat()
 		entity.messages = net.ReadTable()
 		entity.factions = net.ReadTable()
 		entity.classes = net.ReadTable()
-		entity.legal_status = net.ReadString()
 
 		ix.gui.vendor = vgui.Create("ixVendor")
 		ix.gui.vendor:SetReadOnly(true)
@@ -726,14 +702,6 @@ properties.Add("vendor_edit", {
 				itemsTable[k] = v
 			end
 		end
-		
-		local pricesTable = {}
-		
-		for k, v in pairs(entity.prices) do
-			if (!table.IsEmpty(v)) then
-				pricesTable[k] = v
-			end
-		end
 
 		client.ixVendor = entity
 
@@ -743,12 +711,10 @@ properties.Add("vendor_edit", {
 			net.WriteString(entity.password)
 			net.WriteString(entity.card_access)
 			net.WriteTable(itemsTable)
-			net.WriteTable(pricesTable)
 			net.WriteFloat(entity.scale or 0.5)
 			net.WriteTable(entity.messages)
 			net.WriteTable(entity.factions)
 			net.WriteTable(entity.classes)
-			net.WriteString(entity.legal_status)
 		net.Send(client)
 	end
 })

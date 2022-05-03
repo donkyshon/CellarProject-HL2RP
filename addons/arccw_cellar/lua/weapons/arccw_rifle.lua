@@ -10,7 +10,7 @@ SWEP.Slot = 2
 SWEP.UseHands = true
 
 SWEP.ViewModel = "models/weapons/c_ordinalriflearccw.mdl"
-SWEP.WorldModel = "models/weapons/c_ordinalriflearccw.mdl"
+SWEP.WorldModel = "models/weapons/w_ordinalrifle.mdl"
 SWEP.ViewModelFOV = 65
 SWEP.MirrorVMWM = true
 SWEP.WorldModelOffset = {

@@ -121,7 +121,7 @@ if SERVER then
         for k, v in pairs(self.doors) do
 			local door = ents.GetMapCreatedEntity(k)
 
-			doorsData[k] = door:IsLocked() and {v, true} or v
+			doorsData[k] = (IsValid(door) and door:IsLocked()) and {v, true} or v
 		end
 
 		self:SetData(doorsData)
@@ -136,7 +136,10 @@ if SERVER then
 		for doorID, info in pairs(data) do
 			if (isbool(info[2])) then
 				local door = ents.GetMapCreatedEntity(doorID)
-				door:Fire("lock")
+                
+                if (IsValid(door)) then
+					door:Fire("lock")
+               	end
 
 				info = info[1]
 			end

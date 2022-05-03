@@ -431,15 +431,18 @@ else
 			dlight.Decay = 1000
 			dlight.Size = 400
 			dlight.DieTime = CurTime() + 1
-			local dlight2 = DynamicLight(self:EntIndex() + 1)
-			dlight2.pos = self:GetDummy():GetPos()
-			dlight2.r = 255
-			dlight2.g = 2
-			dlight2.b = 0
-			dlight2.brightness = 3
-			dlight2.Decay = 1000
-			dlight2.Size = 400
-			dlight2.DieTime = CurTime() + 1
+
+            if (IsValid(self:GetDummy())) then
+                local dlight2 = DynamicLight(self:EntIndex() + 1)
+                dlight2.pos = self:GetDummy():GetPos()
+                dlight2.r = 255
+                dlight2.g = 2
+                dlight2.b = 0
+                dlight2.brightness = 3
+                dlight2.Decay = 1000
+                dlight2.Size = 400
+                dlight2.DieTime = CurTime() + 1
+          	end
 		end
 	end
 end

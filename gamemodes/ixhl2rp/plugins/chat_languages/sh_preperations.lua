@@ -10,21 +10,19 @@ ix.config.Add("languageTextbooksMinReadTime", 3600, "The time it takes to study 
 })
 
 if (SERVER) then
-	local L = Format
-
 	ix.log.AddType("languageGiven", function(client, targetName, languageName)
-		return L("%s gave to %s %s language.", client:Name(), targetName, languageName)
+		return Format("%s gave to %s %s language.", client:Name(), targetName, languageName)
 	end, FLAG_NORMAL)
 
 	ix.log.AddType("languageTaken", function(client, targetName, languageName)
-		return L("%s took from %s %s language.", client:Name(), targetName, languageName)
+		return Format("%s took from %s %s language.", client:Name(), targetName, languageName)
 	end, FLAG_NORMAL)
 
 	ix.log.AddType("studiedLanguageTextbook", function(client, volumeNumber, volumeCount, languageName)
-		return L("%s have completed %s of %s %s language volumes.", client:Name(), volumeNumber, volumeCount, languageName)
+		return Format("%s have completed %s of %s %s language volumes.", client:Name(), volumeNumber, volumeCount, languageName)
 	end, FLAG_NORMAL)
 
 	ix.log.AddType("studiedLanguage", function(client, languageName)
-		return L("%s have studied %s language.", client:Name(), languageName)
+		return Format("%s have studied %s language.", client:Name(), languageName)
 	end, FLAG_NORMAL)
 end

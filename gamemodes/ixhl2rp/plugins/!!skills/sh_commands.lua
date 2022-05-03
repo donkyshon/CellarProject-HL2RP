@@ -55,6 +55,15 @@ ix.command.Add("CharAddSkill", {
 		local skills = target:GetSkills()
 
 		for k, v in pairs(ix.skills.list) do
+			if (k == skillName) or (L(v.name, client) == skillName) then
+				local value = (skills[k][1] or 0) + math.abs(math.floor(level))
+
+				target:SetSkill(k, value)
+				return "@skillAdd", target:GetName(), L(v.name, client), value
+			end
+		end
+
+		for k, v in pairs(ix.skills.list) do
 			if (ix.util.StringMatches(L(v.name, client), skillName) or ix.util.StringMatches(k, skillName)) then
 				local value = (skills[k][1] or 0) + math.abs(math.floor(level))
 
@@ -77,6 +86,14 @@ ix.command.Add("CharAddSkillXP", {
 		ix.type.number
 	},
 	OnRun = function(self, client, target, skillName, xp)
+		for k, v in pairs(ix.skills.list) do
+			if (k == skillName) or (L(v.name, client) == skillName) then
+				target:UpdateSkillProgress(k, xp)
+
+				return "@skillAddXP", target:GetName(), L(v.name, client), xp
+			end
+		end
+
 		for k, v in pairs(ix.skills.list) do
 			if (ix.util.StringMatches(L(v.name, client), skillName) or ix.util.StringMatches(k, skillName)) then
 				target:UpdateSkillProgress(k, xp)

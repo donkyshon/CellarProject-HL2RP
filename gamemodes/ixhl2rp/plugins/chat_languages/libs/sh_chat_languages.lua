@@ -1,3 +1,4 @@
+
 ix.chatLanguages = ix.chatLanguages or {}
 ix.chatLanguages.list = ix.chatLanguages.list or {}
 ix.chatLanguages.chatTypesList = ix.chatLanguages.chatTypesList or {}
@@ -16,7 +17,7 @@ function ix.chatLanguages.LoadFromDir(directory)
 			CHAT_LANGUAGE.name = CHAT_LANGUAGE.name or "Unknown"
 			CHAT_LANGUAGE.messageIcon = CHAT_LANGUAGE.messageIcon or Material("icon16/flag_blue.png")
 			CHAT_LANGUAGE.panelIcon = CHAT_LANGUAGE.panelIcon or Material("icon16/flag_blue.png", "smooth")
-        	CHAT_LANGUAGE.bNotLearnable = CHAT_LANGUAGE.bNotLearnable or false
+			CHAT_LANGUAGE.bNotLearnable = CHAT_LANGUAGE.bNotLearnable or false
 			CHAT_LANGUAGE.words = CHAT_LANGUAGE.words or {}
 
 			ix.chatLanguages.list[niceName] = CHAT_LANGUAGE
@@ -30,10 +31,6 @@ end
 
 function ix.chatLanguages.Get(uniqueID)
 	return ix.chatLanguages.list[uniqueID]
-end
-
-function ix.chatLanguages.GetStudyTimeLeftGenericDataKey(uniqueID)
-	return uniqueID .. "StudyTimeLeftTextbook"
 end
 
 function ix.chatLanguages.AddChatType(uniqueID)
@@ -49,6 +46,8 @@ end
 function ix.chatLanguages.IsChatTypeValid(uniqueID)
 	return ix.chatLanguages.chatTypesList[uniqueID] == true
 end
+
+
 ix.chatLanguages = ix.chatLanguages or {}
 ix.chatLanguages.list = ix.chatLanguages.list or {}
 ix.chatLanguages.chatTypesList = ix.chatLanguages.chatTypesList or {}
@@ -67,7 +66,7 @@ function ix.chatLanguages.LoadFromDir(directory)
 			CHAT_LANGUAGE.name = CHAT_LANGUAGE.name or "Unknown"
 			CHAT_LANGUAGE.messageIcon = CHAT_LANGUAGE.messageIcon or Material("icon16/flag_blue.png")
 			CHAT_LANGUAGE.panelIcon = CHAT_LANGUAGE.panelIcon or Material("icon16/flag_blue.png", "smooth")
-        	CHAT_LANGUAGE.bNotLearnable = CHAT_LANGUAGE.bNotLearnable or false
+			CHAT_LANGUAGE.bNotLearnable = CHAT_LANGUAGE.bNotLearnable or false
 			CHAT_LANGUAGE.words = CHAT_LANGUAGE.words or {}
 
 			ix.chatLanguages.list[niceName] = CHAT_LANGUAGE
@@ -81,10 +80,6 @@ end
 
 function ix.chatLanguages.Get(uniqueID)
 	return ix.chatLanguages.list[uniqueID]
-end
-
-function ix.chatLanguages.GetStudyTimeLeftGenericDataKey(uniqueID)
-	return uniqueID .. "StudyTimeLeftTextbook"
 end
 
 function ix.chatLanguages.AddChatType(uniqueID)

@@ -25,11 +25,7 @@ function ENT:Initialize()
 
 		self.password = ""
 		self.card_access = ""
-		self.legal_status = 'legal'
-		-- self.margin = 'retail'
-		self.economy_id = ""
 		self.items = {}
-		self.prices = {}
 		self.messages = {}
 		self.factions = {}
 		self.classes = {}
@@ -56,10 +52,6 @@ function ENT:CanAccess(client)
 	local bAccess = false
 	local uniqueID = ix.faction.indices[client:Team()].uniqueID
 	local free_access = true
-	
-	if (self.status == 'legal' and !ix.admiral.GetProperCardID(client:GetCharacter())) then
-		return false
-	end
 
 	if (self.password != "") then
 		free_access = false
@@ -106,20 +98,11 @@ function ENT:GetStock(uniqueID)
 end
 
 function ENT:GetPrice(uniqueID, selling)
-	if (ix.item.list[uniqueID] and self.prices[uniqueID]) then
-		if (selling) then
-			return self.prices[uniqueID]['sell']
-		end
-		return self.prices[uniqueID]['buy']
-	end
-	local price = ix.item.list[uniqueID] and self.prices[uniqueID] and self.prices[uniqueID]['buy'] or ix.item.list[uniqueID].cost or ix.item.list[uniqueID].price or 100
-	--local price = ix.item.list[uniqueID] and self.items[uniqueID] and
-	--	self.items[uniqueID][VENDOR_PRICE] or ix.item.list[uniqueID].cost or ix.item.list[uniqueID].price or 0
-	--print('buying')
+	local price = ix.item.list[uniqueID] and self.items[uniqueID] and
+		self.items[uniqueID][VENDOR_PRICE] or ix.item.list[uniqueID].cost or ix.item.list[uniqueID].price or 0
+
 	if (selling) then
-		--print('selling', self.prices[uniqueID]['sell'])
-		--price = math.floor(price * (self.scale or 0.5))
-		local price = ix.item.list[uniqueID] and self.prices[uniqueID] and self.prices[uniqueID]['sell'] or math.floor(ix.item.list[uniqueID].cost * 0.5) or math.floor(ix.item.list[uniqueID].price * 0.5) or 0
+		price = math.floor(price * (self.scale or 0.5))
 	end
 
 	return price
@@ -136,9 +119,9 @@ function ENT:CanSellToPlayer(client, uniqueID)
 		return false
 	end
 
-	--if (!client:GetCharacter():HasMoney(self:GetPrice(uniqueID))) then
-	--	return false
-	--end
+	if (!client:GetCharacter():HasMoney(self:GetPrice(uniqueID))) then
+		return false
+	end
 
 	if (data[VENDOR_STOCK] and data[VENDOR_STOCK] < 1) then
 		return false
@@ -218,23 +201,6 @@ if (SERVER) then
 	function ENT:OnChangedPassword(password)
 		self.password = password
 	end
-	
-	function ENT:OnChangedEconomyID(economy_id)
-		self.economy_id = economy_id
-		print('I CHANGED IT', self.economy_id)
-	end
-	
-	function ENT:OnChangedLegalStatus(text)
-		if self.legal_status == 'legal' then
-			self.legal_status = 'illegal'
-		else
-			self.legal_status = 'legal'
-		end
-	end
-	
-	function ENT:OnChangedPrice(item)
-		self.prices[item.id] = item
-	end
 
 	function ENT:onEnteredPassword(client, password)
 		if (self.password == "") then
@@ -243,10 +209,6 @@ if (SERVER) then
 		if (password and password == self.password) then
 			self.Sessions[client:GetCharacter():GetID()] = true
 		end
-	end
-	
-	function ENT:UseCallback(activator, info)
-		
 	end
 	
 	function ENT:Use(activator)
@@ -261,11 +223,7 @@ if (SERVER) then
 
 			return
 		end
-		
-		if self.economy_id != '' then
-			ix.admiral.VendorUpdateItems(activator, self)
-		end
-		
+
 		self.receivers[#self.receivers + 1] = activator
 
 		if (self.messages[VENDOR_WELCOME]) then
@@ -280,15 +238,6 @@ if (SERVER) then
 				items[k] = v
 			end
 		end
-		
-		local prices = {}
-		
-		for k, v in pairs(self.prices) do
-			-- if (!table.IsEmpty(v) and (CAMI.PlayerHasAccess(activator, "Helix - Manage Vendors", nil) or v[VENDOR_MODE])) then
-			if (!table.IsEmpty(v)) then
-				prices[k] = v
-			end
-		end
 
 		self.scale = self.scale or 0.5
 
@@ -298,21 +247,15 @@ if (SERVER) then
 		if (character) then
 			character:GetInventory():Sync(activator, true)
 		end
-		
 
 		net.Start("ixVendorOpen")
 			net.WriteEntity(self)
 			net.WriteUInt(self.money or 0, 16)
 			net.WriteTable(items)
-			net.WriteTable(prices)
 			net.WriteFloat(self.scale or 0.5)
-			net.WriteString(self.legal_status)
 		net.Send(activator)
 
 		ix.log.Add(activator, "vendorUse", self:GetDisplayName())
-		-- ix.admiral.UseSalesman(activator, self.economy_id, self.UseCallback)
-
-		
 	end
 
 	function ENT:SetMoney(value)

@@ -39,7 +39,7 @@ ITEM.functions.DisableCamera = {
 function ITEM:CanTransferEquipment(oldinv, newinv, slot)
 	if !self.CPMask then return end
 	if slot != self.slot then return false end
-	local client = newinv:GetOwner()
+	local client = self:GetOwner()
 	return ix.util.StringMatches(client:GetModel(), "cca_")
 end
 
@@ -47,7 +47,7 @@ function ITEM:OnItemUnequipped(client)
 	if !self.CPMask then return end
 	local owner = self:GetOwner()
 	if owner and owner.IsSpectatedBy then
-		for disp, _ in pairs(self.player.IsSpectatedBy) do
+		for disp, _ in pairs(owner.IsSpectatedBy) do
 			dispatch.StopSpectate(disp)
 		end
 	end

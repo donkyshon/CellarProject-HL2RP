@@ -905,7 +905,7 @@ if (SERVER) then
 					local data = table.Copy(item.data)
 					data["T"] = nil
 
-					slots[#slots + 1] = {x, y, item.uniqueID, item.id, item.data}
+					slots[#slots + 1] = {x, y, item.uniqueID, item.id, data}
 				end
 			end
 		end

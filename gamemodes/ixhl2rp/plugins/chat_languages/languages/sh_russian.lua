@@ -31,11 +31,10 @@ LANGUAGE = {
 	noStudyOnMove = "Нельзя изучать язык в движении!",
 	languageStudied = "Поздравляем, Вы изучили %s язык.",
 	volumeStudied = "Вы изучили %s-й из %s томов по языку %s.",
-	textbookStudyProgress = "Прогресс: %s",
-	textbookLanguageStudied = "изучен сам язык",
-	textbookNoStudy = "изучение не начато",
-	textbookStudyInProgress = "изучено %s",
-	textbookStudySuccess = "изучение завершено",
+	textbookLanguageStudied = "Изучен сам язык",
+	textbookNoStudy = "Изучение не начато",
+	textbookStudyInProgress = "Изучено %s",
+	textbookStudySuccess = "Изучение завершено",
 
 	-- languages names
 	Chinese = "Китайский",

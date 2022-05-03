@@ -29,9 +29,8 @@ LANGUAGE = {
 	noStudyOnMove = "You can't study a language while you in move!",
 	languageStudied = "Congratulations, you've studied %s.",
 	volumeStudied = "You have completed %s of %s %s volumes.",
-	textbookStudyProgress = "Progress: %s",
-	textbookLanguageStudied = "studied the language itself",
-	textbookNoStudy = "study not started",
-	textbookStudyInProgress = "studied %s",
-	textbookStudySuccess = "study finished"
+	textbookLanguageStudied = "Studied the language itself",
+	textbookNoStudy = "Study not started",
+	textbookStudyInProgress = "Studied %s",
+	textbookStudySuccess = "Study finished"
 }

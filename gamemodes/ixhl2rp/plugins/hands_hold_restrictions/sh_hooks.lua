@@ -24,12 +24,30 @@ function PLUGIN:SetupMove(client, moveData)
 			prone.Exit(client)
 		end
 
-		moveData:SetMaxClientSpeed(client:GetWalkSpeed() * (speedMultipliers[heldPlayer:Team()] or 0.5))
+		local character = client:GetCharacter()
+		local strength = character:GetSpecial("st")
+		local strengthFraction = 1 - strength / ix.config.Get("maxAttributes", 10)
+		local speedMultiplier = speedMultipliers[heldPlayer:Team()] or 0.5
+		speedMultiplier = math.abs(speedMultiplier * strengthFraction - 1)
+
+		moveData:SetMaxClientSpeed(client:GetWalkSpeed() * speedMultiplier)
 	end
 end
 
 PLUGIN["prone.CanEnter"] = function(_, client)
 	if (GetHeldChar(client)) then
 		return false
+	end
+end
+
+if (SERVER) then
+	function PLUGIN:CanPlayerHoldObject(client, entity)
+		if (entity.ixPlayer) then
+			local character = client:GetCharacter()
+
+			if (character:GetSpecial("st") < 2) then
+				return false
+			end
+		end
 	end
 end

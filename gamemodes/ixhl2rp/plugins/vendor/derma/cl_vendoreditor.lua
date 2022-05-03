@@ -41,11 +41,6 @@ function PANEL:Init()
 	self.password:Dock(TOP)
 	self.password:DockMargin(0, 4, 0, 0)
 	self.password:SetText(entity.password)
-	
-	self.legal_status = self:Add("DLabel")
-	self.legal_status:Dock(TOP)
-	self.legal_status:DockMargin(0, 4, 0, 0)
-	self.legal_status:SetText(entity.legal_status)
 
 	self.model = self:Add("DTextEntry")
 	self.model:Dock(TOP)

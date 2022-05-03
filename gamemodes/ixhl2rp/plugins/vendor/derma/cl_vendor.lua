@@ -140,7 +140,7 @@ end
 
 function PANEL:Setup(entity)
 	self.entity = entity
-	self:SetTitle(string.format("Name: %s, Status: %s", entity:GetDisplayName(), entity.legal_status))
+	self:SetTitle(entity:GetDisplayName())
 	self.vendorName:SetText(entity:GetDisplayName()..(entity.money and " ("..entity.money..")" or ""))
 
 	self.vendorBuy:SetEnabled(!self:GetReadOnly())
@@ -174,7 +174,7 @@ function PANEL:Think()
 	end
 
 	if ((self.nextUpdate or 0) < CurTime()) then
-		self:SetTitle(string.format("Name: %s, Status: %s", entity:GetDisplayName(), entity.legal_status))
+		self:SetTitle(self.entity:GetDisplayName())
 		self.vendorName:SetText(entity:GetDisplayName()..(entity.money and " ("..ix.currency.Get(entity.money)..")" or ""))
 		self.ourName:SetText(L"you".." ("..ix.currency.Get(LocalPlayer():GetCharacter():GetMoney())..")")
 
@@ -184,11 +184,11 @@ end
 
 function PANEL:OnItemSelected(panel)
 	local price = self.entity:GetPrice(panel.item, panel.isLocal)
-	
+
 	if (panel.isLocal) then
-		self.vendorBuy:SetText(L"sell".." ("..ix.admiral.GetCredits(price, self.entity.legal_status)..")")
+		self.vendorBuy:SetText(L"sell".." ("..ix.currency.Get(price)..")")
 	else
-		self.vendorSell:SetText(L"purchase".." ("..ix.admiral.GetCredits(price, self.entity.legal_status)..")")
+		self.vendorSell:SetText(L"purchase".." ("..ix.currency.Get(price)..")")
 	end
 end
 
