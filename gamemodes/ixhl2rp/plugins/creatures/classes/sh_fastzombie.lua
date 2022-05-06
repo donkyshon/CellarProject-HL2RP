@@ -122,10 +122,14 @@ CLASS.infoTable = {
 
 	glideThink = function(player, infoTable)
 		if (player.canAttack) then
-			local attack = player:TraceHullAttack(player:EyePos(), player:EyePos() + player:EyeAngles():Forward() * 50,  Vector(-20,-20,-20),  Vector(20,20,20), 20, DMG_SLASH, 1, true);
+            local shootPos = player:GetShootPos()
+			local attack = player:TraceHullAttack(shootPos, shootPos + player:GetAimVector() * 50,  Vector(-5,-5,-5),  Vector(5,5,5), 20, DMG_SLASH, 1, true);
 
 			if (IsValid(attack)) then
-				attack:SetVelocity(player:GetVelocity():GetNormalized() * 300);
+				if (attack:IsPlayer() or attack:IsNPC()) then
+					attack:SetVelocity(player:GetVelocity():GetNormalized() * 300);
+				end
+
 				player:SoundEvent("melee_hit");
 				player.canAttack = nil;
 			end;
