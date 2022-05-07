@@ -8,7 +8,7 @@ RECIPE.results = {
     ["cap"] = 1
 }
 RECIPE.station = "station_tailor"
-RECIPE.skill = {"tailoring", 0}
+RECIPE.skill = {"tailoring", 1}
 RECIPE.tools = {"tool_scissors"}
 RECIPE.description = nil
 RECIPE.model = nil

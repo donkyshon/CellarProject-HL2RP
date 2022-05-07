@@ -633,6 +633,7 @@ function PLUGIN:DoPluginIncludes(path)
 end
 
 function PLUGIN:CharacterMaxStamina(character)
+	if !character then return 100 end
 	local base = 30 + (12 * character:GetSpecial("en"))
 	local mod = 1
 	local thirst = character:GetThirst()

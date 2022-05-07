@@ -5,7 +5,7 @@ ITEM.height = 2 -- высота
 ITEM.description = "Маска, способная напомнить о самых страшных событиях, которые уже произошли или только будут происходить в будущем."
 ITEM.slot = EQUIP_MASK -- слот ( EQUIP_MASK EQUIP_HEAD EQUIP_LEGS EQUIP_HANDS EQUIP_TORSO )
 ITEM.bodyGroups = { -- 	какие бодигруппы на какие сетаются
-	[1] = 8,
+	[1] = 6,
 }
 ITEM.CanBreakDown = false -- можно ли порвать на тряпки
 ITEM.thermalIsolation = 1 -- (от 1 до 4)
@@ -17,7 +17,7 @@ ITEM.Filters = {
 }
 ITEM.Stats = {
 	[HITGROUP_GENERIC] = 0,
-	[HITGROUP_HEAD] = 1,
+	[HITGROUP_HEAD] = 5,
 	[HITGROUP_CHEST] = 0,
 	[HITGROUP_STOMACH] = 0,
 	[4] = 0,

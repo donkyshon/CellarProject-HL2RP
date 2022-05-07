@@ -3,8 +3,7 @@ ITEM.description = "Продвинутая маска-противогаз Гр�
 ITEM.model = Model("models/vintagethief/items/cca/mask_01.mdl")
 ITEM.rarity = 2
 ITEM.bodyGroups = {
-	[4] = 2,
-	[6] = 1
+	[2] = 2,
 }
 ITEM.Filters = {
 	["filter_epic"] = false,

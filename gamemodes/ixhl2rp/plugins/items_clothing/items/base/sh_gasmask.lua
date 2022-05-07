@@ -16,7 +16,7 @@ ITEM.functions.EnableCamera = {
 		return false
 	end,
 	OnCanRun = function(item)
-		return item.CPMask and !item:GetData("bCamOn", false)
+		return item.CPMask and !item:GetData("bCamOn", false) or false
 	end
 }
 
@@ -32,7 +32,7 @@ ITEM.functions.DisableCamera = {
 		return false
 	end,
 	OnCanRun = function(item)
-		return item.CPMask and item:GetData("bCamOn", false)
+		return item.CPMask and item:GetData("bCamOn", false) or false
 	end
 }
 

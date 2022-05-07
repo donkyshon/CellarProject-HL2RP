@@ -75,8 +75,6 @@ ITEM.functions.Study = {
 					local languageName = L(languageData.name, client)
 					local volumeCount = ix.config.Get("languageTextbooksVolumeCount", 3)
 					local studyProgresses = character:GetLanguageStudyProgress(item.languageID)
-                    print("LANGUAGE:")
-                    PrintTable(studyProgresses)
 
 					for i = 1, volumeCount do
 						if (item.volume != i and studyProgresses[i] != true) then
@@ -98,7 +96,7 @@ ITEM.functions.Study = {
 					timer.Remove(timerID)
 				end)
 
-				timer.Create(timerID, 0.1, math.floor(studyProgress / 0.1), function()
+				timer.Create(timerID, 0.1, studyProgress / 0.1, function()
 					if (IsValid(client)) then
 						local bNotInInventory = client != item:GetOwner()
 

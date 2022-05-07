@@ -3,8 +3,7 @@ ITEM.description = "Сверхзащищенная титановая маска
 ITEM.model = Model("models/vintagethief/items/cca/mask_02.mdl")
 ITEM.rarity = 2
 ITEM.bodyGroups = {
-	[4] = 3,
-	[6] = 1
+	[2] = 3
 }
 ITEM.Filters = {
 	["filter_epic"] = true,

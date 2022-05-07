@@ -185,7 +185,11 @@ function SWEP:PrimaryAttack()
 		self.IronSightsAng  = Vector(-5, 100, 10)
 	end
 
-	self:SendWeaponAnim(ACT_VM_PRIMARYATTACK)
+	-- self:SendWeaponAnim(ACT_VM_PRIMARYATTACK)
+	if SERVER then 
+		self.Owner:SetVelocity(Vector(0,0,0))
+		self.Owner:ForceSequence("Zapattack1",nil,1.1)
+	end
 
 	local chargeSound = CreateSound(self.Owner, "NPC_Vortigaunt.ZapPowerup")
 	chargeSound:Play()
@@ -193,13 +197,13 @@ function SWEP:PrimaryAttack()
 	ParticleEffectAttach("vortigaunt_charge_token", PATTACH_POINT_FOLLOW, self.Owner, self.Owner:LookupAttachment("leftclaw"))
 	ParticleEffectAttach("vortigaunt_charge_token", PATTACH_POINT_FOLLOW, self.Owner, self.Owner:LookupAttachment("rightclaw"))
 
-	timer.Simple(1, function()
-		if !IsValid(self.Owner) or CLIENT then
-			return
-		end
+	-- timer.Simple(1, function()
+	-- 	if !IsValid(self.Owner) or CLIENT then
+	-- 		return
+	-- 	end
 
-		self.Owner:SetAnimation( PLAYER_ATTACK1 )
-	end)
+	-- 	self.Owner:SetAnimation( PLAYER_ATTACK1 )
+	-- end)
 
 	timer.Simple(0.5, function()
 		chargeSound:Stop()
@@ -236,15 +240,27 @@ function SWEP:PrimaryAttack()
 			damageInfo:SetDamagePosition(tr.HitPos)
 			damageInfo:SetDamageType(DMG_SHOCK)
 
-			for k, v in ipairs(ents.FindInSphere(tr.HitPos, 48)) do
-				local target = IsValid(v.ixPlayer) and v.ixPlayer or v
+			local trent = tr.Entity
+			if IsValid(trent) and (trent:IsPlayer() or trent:IsNPC()) then
+				trent:TakeDamageInfo(damageInfo)
+			else
+				for k, v in ipairs(ents.FindInSphere(tr.HitPos, 48)) do
+					-- local isplayer = v:IsPlayer()
+					-- if isplayer then
+					-- 	if v:Team() == FACTION_VORTIGAUNT then continue end
+					-- end
+					-- if !v:IsNPC() and !isplayer then continue end
 
-				if target and (target:IsNPC() or target:IsPlayer()) then
-					if target:Team() == FACTION_VORTIGAUNT then continue end
-					
-					target:TakeDamageInfo(damageInfo)
+					if (v:IsPlayer() and v:Team() == FACTION_VORTIGAUNT) or (!v:IsNPC() and !v:IsPlayer()) then
+						continue
+					end
+	
+					v:TakeDamageInfo(damageInfo)
+	
 				end
 			end
+
+			
 		end
 
 		local viewModel = self.Owner:GetViewModel()

@@ -29,9 +29,9 @@ PLUGIN.emptycont = {
 }
 
 PLUGIN.fullcont = {
-	["empty_can"] = "breens_water", --test
-	["empty_glass_bottle"] = "purified_water",
-	["empty_plastic_bottle"] = "old_soda",
-	["empty_plastic_can"] = "breens_water",
-	["empty_tin_can"] = "spoiled_beer"
+	["empty_can"] = "can_with_water", -- +
+	["empty_glass_bottle"] = "purified_water", -- +
+	["empty_plastic_bottle"] = "plastic_bottle_of_water", -- +
+	["empty_plastic_can"] = "plastic_jar_of_water", -- +
+	["empty_tin_can"] = "tin_can_of_water" -- +
 }

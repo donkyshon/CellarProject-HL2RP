@@ -48,4 +48,11 @@ ix.action:Register("healingTarget", "medicine", {
 	experience = function(action, character, skill, data)
 		return 15 * GetHealFactor(data)
 	end
+})
+
+ix.action:Register("craft_medicine", "medicine", {
+	name = "Крафт",
+	experience = function(action, character, skill, price)
+		return price
+	end
 })
