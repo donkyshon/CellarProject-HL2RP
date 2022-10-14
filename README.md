@@ -1,6 +1,6 @@
 # CellarProject HL2RP
 
-This is source code of biggest server on Half-Life 2 roleplaying russian community "CELLAR-PROJECT". No new features will be added to the code. No bugs and decompilation bugs will be fixed.
+This is client-side code of biggest server on Half-Life 2 roleplaying russian community "CELLAR-PROJECT". No new features will be added to the code. No bugs and decompilation bugs will be fixed.
 
 ## Usage
 
